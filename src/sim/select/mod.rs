@@ -21,6 +21,7 @@
 //! Each of the selection algorithms provided has a parameter `count`, which indicates the
 //! number of selected parents.
 
+mod parmax;
 mod max;
 mod tournament;
 mod stochastic;
@@ -28,6 +29,7 @@ mod stochastic;
 use pheno::{Fitness, Phenotype};
 use std::fmt::Debug;
 
+pub use self::parmax::ParMaximizeSelector;
 pub use self::max::MaximizeSelector;
 pub use self::tournament::TournamentSelector;
 pub use self::stochastic::StochasticSelector;

@@ -55,17 +55,23 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
+          F: Sync,
           F: Fitness
 {
     type B = SimulatorBuilder<'a, T, F>;
 
     /// Create builder.
-    fn builder(population: &'a mut Vec<T>) -> SimulatorBuilder<'a, T, F> {
+    fn builder(population: &'a mut Vec<T>) -> SimulatorBuilder<'a, T, F> 
+    where T: Sync,
+          T: Send,
+          F: Send,
+          F: Sync
+    {
         SimulatorBuilder {
             sim: Simulator {
                 population: population,
                 iter_limit: IterLimit::new(100),
-                selector: Box::new(MaximizeSelector::new(3)),
+                selector: Box::new(ParMaximizeSelector::new(3)),
                 earlystopper: None,
                 duration: Some(0),
                 error: None,
@@ -267,7 +273,7 @@ mod tests {
 
     #[test]
     fn test_kill_off_count() {
-        let selector = MaximizeSelector::new(2);
+        let selector = ParMaximizeSelector::new(2);
         let mut population: Vec<Test> = (0..100).map(|i| Test { f: i }).collect();
         let mut s = par::Simulator::builder(&mut population)
                         .set_selector(Box::new(selector))
@@ -278,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_max_iters() {
-        let selector = MaximizeSelector::new(2);
+        let selector = ParMaximizeSelector::new(2);
         let mut population: Vec<Test> = (0..100).map(|i| Test { f: i }).collect();
         let mut s = par::Simulator::builder(&mut population)
                         .set_selector(Box::new(selector))
@@ -290,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_early_stopping() {
-        let selector = MaximizeSelector::new(2);
+        let selector = ParMaximizeSelector::new(2);
         let mut population: Vec<Test> = (0..100).map(|_| Test { f: 0 }).collect();
         let mut s = par::Simulator::builder(&mut population)
                         .set_selector(Box::new(selector))
@@ -303,7 +309,7 @@ mod tests {
 
     #[test]
     fn test_selector_error_propagate() {
-        let selector = MaximizeSelector::new(0);
+        let selector = ParMaximizeSelector::new(0);
         let mut population: Vec<Test> = (0..100).map(|i| Test { f: i }).collect();
         let mut s = par::Simulator::builder(&mut population)
                         .set_selector(Box::new(selector))
@@ -314,7 +320,7 @@ mod tests {
 
     #[test]
     fn test_population_get() {
-        let selector = MaximizeSelector::new(0);
+        let selector = ParMaximizeSelector::new(0);
         let mut population: Vec<Test> = (0..100).map(|i| Test { f: i }).collect();
         let population_len = population.len();
         let s = par::Simulator::builder(&mut population)
