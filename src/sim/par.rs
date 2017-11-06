@@ -29,6 +29,7 @@ use super::iterlimit::*;
 use super::earlystopper::*;
 use std::time::Instant;
 use std::marker::PhantomData;
+use std::fmt::Display;
 use rayon::prelude::*;
 
 /// A parallel implementation of `::sim::Simulation`.
@@ -38,7 +39,9 @@ pub struct Simulator<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness
+          F: Fitness,
+          F: Display,
+          F: Display
 {
     population: &'a mut Vec<T>,
     iter_limit: IterLimit,
@@ -56,16 +59,17 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
           T: Send,
           F: Send,
           F: Sync,
-          F: Fitness
+          F: Fitness, F: Display,
+          F: Display
 {
     type B = SimulatorBuilder<'a, T, F>;
 
     /// Create builder.
-    fn builder(population: &'a mut Vec<T>) -> SimulatorBuilder<'a, T, F> 
-    where T: Sync,
-          T: Send,
-          F: Send,
-          F: Sync
+    fn builder(population: &'a mut Vec<T>) -> SimulatorBuilder<'a, T, F>
+        where T: Sync,
+              T: Send,
+              F: Send,
+              F: Sync
     {
         SimulatorBuilder {
             sim: Simulator {
@@ -113,6 +117,9 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
                                   .map(|&(a, b)| a.crossover(b))
                                   .map(|c| c.mutate())
                                   .collect();
+                for child in children.clone() {
+                    println!("child added with fitness {}", child.fitness());
+                }
             }
             // Kill off parts of the population at random to make room for the children
             self.kill_off(children.len());
@@ -191,7 +198,8 @@ impl<'a, T, F> Simulator<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness
+          F: Fitness, F: Display,
+          F: Display
 {
     /// Kill off phenotypes using stochastic universal sampling.
     fn kill_off(&mut self, count: usize) {
@@ -212,7 +220,8 @@ pub struct SimulatorBuilder<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness
+          F: Fitness,
+          F: Display
 {
     sim: Simulator<'a, T, F>,
 }
@@ -222,7 +231,7 @@ impl<'a, T, F> SimulatorBuilder<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness
+          F: Fitness, F: Display
 {
     /// Set the selector of the resulting `Simulator`.
     ///
@@ -257,7 +266,7 @@ impl<'a, T, F> Builder<Simulator<'a, T, F>> for SimulatorBuilder<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness
+          F: Fitness, F: Display
 {
     fn build(self) -> Simulator<'a, T, F> {
         self.sim
