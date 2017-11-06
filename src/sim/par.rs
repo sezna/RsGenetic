@@ -40,7 +40,6 @@ pub struct Simulator<'a, T, F>
           T: Send,
           F: Send,
           F: Fitness,
-          F: Display,
           F: Display
 {
     population: &'a mut Vec<T>,
@@ -59,8 +58,8 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
           T: Send,
           F: Send,
           F: Sync,
-          F: Fitness, F: Display,
-          F: Display
+          F: Fitness, 
+          F: Display,
 {
     type B = SimulatorBuilder<'a, T, F>;
 
@@ -118,7 +117,7 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
                                   .map(|c| c.mutate())
                                   .collect();
                 for child in children.clone() {
-                    println!("child added with fitness {}", child.fitness());
+                    println!("{}, new_child", child.fitness());
                 }
             }
             // Kill off parts of the population at random to make room for the children
@@ -198,8 +197,8 @@ impl<'a, T, F> Simulator<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness, F: Display,
-          F: Display
+          F: Fitness,
+          F: Display,
 {
     /// Kill off phenotypes using stochastic universal sampling.
     fn kill_off(&mut self, count: usize) {
@@ -266,7 +265,8 @@ impl<'a, T, F> Builder<Simulator<'a, T, F>> for SimulatorBuilder<'a, T, F>
           T: Sync,
           T: Send,
           F: Send,
-          F: Fitness, F: Display
+          F: Fitness, 
+          F: Display
 {
     fn build(self) -> Simulator<'a, T, F> {
         self.sim
