@@ -52,12 +52,15 @@ impl<T, F> Selector<T, F> for ParMaximizeSelector
                                self.count));
         }
 
-        let mut borrowed: Vec<&T> = population.par_iter().collect();
-        borrowed.par_sort_by(|x, y| y.fitness().cmp(&x.fitness()));
+
+        let mut paint_with_fitness: Vec<(&T, F)> = population.par_iter().map(|x| (x,
+                                                                    x.fitness())).collect();
+        paint_with_fitness.par_sort_by(|x, y| x.1.cmp(&y.1));
+
         let mut index = 0;
         let mut result: Parents<&T> = Vec::new();
         while index < self.count {
-            result.push((borrowed[index], borrowed[index + 1]));
+            result.push((paint_with_fitness[index].0, paint_with_fitness[index + 1].0));
             index += 2;
         }
         Ok(result)
