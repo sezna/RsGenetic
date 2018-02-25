@@ -26,6 +26,9 @@ pub trait Fitness: Ord + Eq {
     fn zero() -> Self;
     /// Get the absolute difference between two `Fitness` values.
     fn abs_diff(&self, other: &Self) -> Self;
+
+    /// For output purposes, require some sort of integer representation.
+    fn as_u64(&self) -> u64;
 }
 
 /// Defines what a Phenotype is.

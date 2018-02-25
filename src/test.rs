@@ -33,6 +33,10 @@ impl Fitness for MyFitness {
     fn abs_diff(&self, other: &Self) -> Self {
         MyFitness { f: (self.f - other.f).abs() }
     }
+
+    fn as_u64(&self) -> u64 {
+        return self.f as u64;
+    }
 }
 
 #[derive(Clone, Copy)]

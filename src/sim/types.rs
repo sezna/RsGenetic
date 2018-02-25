@@ -49,6 +49,10 @@ macro_rules! implement_fitness_int {
                         other - self
                     }
                 }
+                
+                fn as_u64(&self) -> u64 {
+                    return *self as u64;
+                }
             }
         )*
     }
