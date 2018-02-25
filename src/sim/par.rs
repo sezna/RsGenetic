@@ -118,6 +118,12 @@ impl<'a, T, F> Simulation<'a, T, F> for Simulator<'a, T, F>
             self.kill_off(children.len());
             self.population.append(&mut children);
 
+            let highest_fitness = self.population
+                                      .par_iter()
+                                      .max_by_key(|x| x.fitness())
+                                      .unwrap()
+                                      .fitness();
+            println!("{}", highest_fitness.as_u64());
             if let Some(ref mut stopper) = self.earlystopper {
                 let highest_fitness = self.population
                                           .par_iter()
