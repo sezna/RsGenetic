@@ -56,6 +56,7 @@ impl<T, F> Selector<T, F> for ParMaximizeSelector
         borrowed.par_sort_by(|x, y| y.fitness().cmp(&x.fitness()));
         let mut index = 0;
         let mut result: Parents<&T> = Vec::new();
+	println!("{}", borrowed[0].fitness().as_u64());
         while index < self.count {
             result.push((borrowed[index], borrowed[index + 1]));
             index += 2;
