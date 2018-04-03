@@ -17,6 +17,7 @@
 use pheno::{Fitness, Phenotype};
 use super::*;
 use rand::Rng;
+use rayon::prelude::*;
 
 /// Runs several tournaments, and selects best performing phenotypes from each tournament.
 #[derive(Copy, Clone, Debug)]
@@ -44,9 +45,16 @@ impl TournamentSelector {
 
 impl<T, F> Selector<T, F> for TournamentSelector
     where T: Phenotype<F>,
-          F: Fitness
+          F: Fitness,
+					T: Sync,
+					T: Send,
+					F: Sync,
+					F: Send
 {
-    fn select<'a>(&self, population: &'a [T]) -> Result<Parents<&'a T>, String> {
+    fn select<'a>(&self, population: &'a [T]) -> Result<Parents<&'a T>, String> 
+	where T: Sync, T:
+    Send, F: Sync, F: Send 	
+		{
         if self.count == 0 || self.count % 2 != 0 || self.count * 2 >= population.len() {
             return Err(format!("Invalid parameter `count`: {}. Should be larger than zero, a \
                                 multiple of two and less than half the population size.",
@@ -69,6 +77,9 @@ impl<T, F> Selector<T, F> for TournamentSelector
             tournament.sort_by(|x, y| y.fitness().cmp(&x.fitness()));
             result.push((tournament[0], tournament[1]));
         }
+				let mut borrowed: Vec<&T> = population.par_iter().collect();
+				borrowed.par_sort_by(|x, y| y.fitness().cmp(&x.fitness()));
+				println!("{}", borrowed[0].fitness().as_u64());
         Ok(result)
     }
 }
