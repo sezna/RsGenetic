@@ -74,7 +74,7 @@ impl<T, F> Selector<T, F> for TournamentSelector
                 let index = rng.gen_range::<usize>(0, population.len());
                 tournament.push(&population[index]);
             }
-            tournament.sort_by(|x, y| y.fitness().cmp(&x.fitness()));
+            tournament.par_sort_by(|x, y| y.fitness().cmp(&x.fitness()));
             result.push((tournament[0], tournament[1]));
         }
 				let mut borrowed: Vec<&T> = population.par_iter().collect();
